@@ -105,14 +105,13 @@ namespace Simplificador
             }
             sw.Stop(); //Finaliza contagem de tempo
             Console.WriteLine("");
-            Console.Write("Opção 1:");
-            
             //*** ultima solução encontrada
             Imprimir_Resultados(encontrouSolucao, numerador, denominador, sw, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
 
+
+/* MENOR ERRO ENCONTRADO
             Console.WriteLine("");
-            Console.Write("Opção 2:");
-            
+            Console.Write("Menor erro percentual:");
             double menor = percentualErro;
             int i=0,j=0;
             foreach (var item in MelhoresErroPercentual)
@@ -125,8 +124,12 @@ namespace Simplificador
                 j++;
             }
 
-            //*** ultima solução encontrada
-            Imprimir_Resultados(encontrouSolucao, numerador, denominador, sw, MelhoresNumeradores[i], MelhoresDenominadores[i], MelhoresErroPercentual[i]);
+            if(MelhoresErroPercentual[i]< MelhorErroPercentual)
+            {
+                //*** Menor erro encontrado
+                Imprimir_Resultados(encontrouSolucao, numerador, denominador, sw, MelhoresNumeradores[i], MelhoresDenominadores[i], MelhoresErroPercentual[i]);
+            }
+*/
         }
       
         static void EscreverCabecalho()
