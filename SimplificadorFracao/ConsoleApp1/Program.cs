@@ -56,6 +56,11 @@ namespace Simplificador
             int MelhorNumerador = 0;
             int MelhorDenominador = 0;
             double MelhorErroPercentual = 0.0;
+
+            List<int> MelhoresNumeradores = new List<int>();
+            List<int> MelhoresDenominadores = new List<int>();
+            List<double> MelhoresErroPercentual = new List<double>();
+
             sw.Start(); //Inicia contagem de tempo
 
             //*** Se entrada numerador e denominador for par simplifica antes do calculo de erro
@@ -69,6 +74,7 @@ namespace Simplificador
             //*** Processamento de erro
             for (int divisor = 2; divisor <= denominador; divisor++)
             {
+                
                 if (numerador == 1)
                     break;
 
@@ -79,10 +85,18 @@ namespace Simplificador
 
                 if (erroPercentual <= percentualErro)
                 {
+                    //*** Lista com todos os resultados dentro do percentual desejado
+                    MelhoresNumeradores.Add(novoNumerador);
+                    MelhoresDenominadores.Add(novoDenominador);
+                    MelhoresErroPercentual.Add(erroPercentual);
+
+                    //*** Armazena a ultima solução dentro do percentual desejado
                     encontrouSolucao = true;
                     MelhorNumerador = novoNumerador;
                     MelhorDenominador = novoDenominador;
                     MelhorErroPercentual = erroPercentual;
+
+                    //percentualErro = erroPercentual;
 
                     //*** Se numerador for igual a 1 finaliza
                     if (novoNumerador == 1)
@@ -91,7 +105,28 @@ namespace Simplificador
             }
             sw.Stop(); //Finaliza contagem de tempo
             Console.WriteLine("");
+            Console.Write("Opção 1:");
+            
+            //*** ultima solução encontrada
             Imprimir_Resultados(encontrouSolucao, numerador, denominador, sw, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
+
+            Console.WriteLine("");
+            Console.Write("Opção 2:");
+            
+            double menor = percentualErro;
+            int i=0,j=0;
+            foreach (var item in MelhoresErroPercentual)
+            {
+                if(item < menor)
+                {
+                    menor = item;
+                    i = j;
+                }
+                j++;
+            }
+
+            //*** ultima solução encontrada
+            Imprimir_Resultados(encontrouSolucao, numerador, denominador, sw, MelhoresNumeradores[i], MelhoresDenominadores[i], MelhoresErroPercentual[i]);
         }
       
         static void EscreverCabecalho()
