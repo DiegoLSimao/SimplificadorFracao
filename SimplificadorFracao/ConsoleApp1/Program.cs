@@ -96,8 +96,6 @@ namespace Simplificador
                     MelhorDenominador = novoDenominador;
                     MelhorErroPercentual = erroPercentual;
 
-                    //percentualErro = erroPercentual;
-
                     //*** Se numerador for igual a 1 finaliza
                     if (novoNumerador == 1)
                         break;
