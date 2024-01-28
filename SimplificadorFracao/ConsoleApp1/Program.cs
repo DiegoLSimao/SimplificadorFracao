@@ -10,6 +10,8 @@ namespace Simplificador
 {
     class Program
     {
+        //todo implementar atualizador automático
+
         static bool Cabecalho = false;
         static bool Loop = false;
         static string Metodo = string.Empty;
