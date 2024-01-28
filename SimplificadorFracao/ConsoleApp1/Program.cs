@@ -416,7 +416,7 @@ namespace Simplificador
 
             //*** informações
             Console.WriteLine("Opção 1, Menor Fração:\r\nO usuário deve informar o numerador e denominador da fração e o sistema\r\nirá simplificar e encontrar a menor fração mais precisa possível.\r\nO resultado pode ser muito pior que a fração já informada, neste caso a fração informada já deve ser a melhor solução.\r\nO usuário deve analizar o percentual de erro e decidir se faz sentido utilizar ou não!\r\n");
-            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário delimita o percentual de erro admitido.\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual de erro admitido.\r\n");
+            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual de erro admitido.\r\n");
             Console.WriteLine("Obs.: Numerador e denominador obrigatóriamente deve ser números inteiro.\r\nPercentual aceita casas decimais no método Menor Erro.\r\n");
             Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será aprensetada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n");
             
