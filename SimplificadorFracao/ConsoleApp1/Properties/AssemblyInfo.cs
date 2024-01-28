@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("Simplificador de fracao com percentual de erro")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Diego de Lima Simao Tecnologia da Informacao")]
-[assembly: AssemblyProduct("Simplificador de Fracao")]
+[assembly: AssemblyProduct("Simplificador de Fracao - SimpliFração")]
 [assembly: AssemblyCopyright("Copyright ©  2023")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

@@ -37,7 +37,7 @@ namespace Simplificador
                     case 1:
                         {
                             var MetodoEscolhido = Definicao_Metodo();
-                            if (MetodoEscolhido == 3) Estado = 0;
+                            if (MetodoEscolhido == 3 || MetodoEscolhido == 6) Estado = 0;
                             else if (MetodoEscolhido == 4) return;
                             else if (MetodoEscolhido == 5) break;
                             else Estado = 2;
@@ -220,6 +220,12 @@ namespace Simplificador
                 else if (string.Equals(Metodo, "4"))
                 {
                     ret = 4;
+                }
+                //*** Sobre
+                else if (string.Equals(Metodo, "?"))
+                {
+                    Sobre();
+                    ret = 6;
                 }
                 else //Recomeçar, usuário não ecolheu uma opção válida
                 {
@@ -413,10 +419,10 @@ namespace Simplificador
             Console.Clear();
 
             //*** informações
-            Console.WriteLine("Opção 1, Menor Fração:\r\nO usuário deve informar o numerador e denominador da fração e o sistema\r\nirá simplificar e encontrar a menor fração mais precisa possível.\r\nO resultado pode ser muito pior que a fração já informada, neste caso a fração informada já deve ser a melhor solução.\r\nO usuário deve analizar o percentual de erro e decidir se faz sentido utilizar ou não!\r\n");
-            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual de erro admitido.\r\n");
-            Console.WriteLine("Obs.: Numerador e denominador obrigatóriamente deve ser números inteiro.\r\nPercentual aceita casas decimais no método Menor Erro.\r\n");
-            Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será aprensetada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n");
+            Console.WriteLine("Opção 1, Menor Fração:\r\nO usuário deve informar o numerador e denominador da fração e o sistema\r\nirá simplificar e encontrar a menor fração mais precisa possível.\r\nO usuário deve analizar o percentual de erro e decidir se faz sentido utilizar ou não!\r\n\r\n");
+            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual de erro admitido.\r\n\r\n");
+            Console.WriteLine("Obs.: Numerador e denominador obrigatóriamente deve ser números inteiro.\r\nPercentual aceita casas decimais no método Menor Erro.\r\n\r\n");
+            Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será aprensetada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n\r\n");
             
             Console.WriteLine("Presione Enter para continuar!");
             Console.ReadLine();
@@ -425,7 +431,34 @@ namespace Simplificador
             Metodo = string.Empty;
             Console.Clear();
         }
-    
+
+        static void Sobre()
+        {
+
+            var user = Environment.UserName;
+            var maquina = Environment.MachineName;
+            var diretorio = Environment.CurrentDirectory;
+            var os = Environment.OSVersion.ToString();
+            var programador = "Eng. Diego de Lima Simão [simaold@gmail.com]";
+            Version versionAss = Assembly.GetEntryAssembly().GetName().Version;
+
+
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("---------- SimpliFração ---------- ");
+
+            var mensagem = $"Usuário: {user} \nMáquina: {maquina} \nCaminho: {diretorio}\nOS: {os} \nVersão Assembly: {versionAss}\nProgramador: {programador}";
+
+            Console.WriteLine(mensagem);
+
+            Console.WriteLine("\r\nPresione Enter para continuar!");
+            Console.ReadLine();
+            Console.ResetColor();
+
+            //*** Limpar tela
+            Metodo = string.Empty;
+            Console.Clear();
+        }
     }
 
 
