@@ -68,9 +68,8 @@ namespace Simplificador
 
                     default:
                         {
-                            Console.WriteLine("ERRO GRAVE, Tem que tá vendo isso!");
+                            Console.WriteLine($"Estado={Estado} --> ERRO GRAVE, Tem que tá vendo isso!");
                             Console.ReadLine();
-                            Console.Clear();
                             Estado = 0;
                             break;
                         }
