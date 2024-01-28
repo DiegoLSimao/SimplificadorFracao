@@ -268,6 +268,8 @@ namespace Simplificador
         {
             string num, den, erro;
 
+            //todo implementar operação quando o sinal de igual for digitado Ex: =44+55 assumiria Numerador = 99
+
             Console.Write("Numerador: ");
             num = Console.ReadLine();
             Console.Write("Denominador: ");
@@ -434,7 +436,6 @@ namespace Simplificador
 
         static void Sobre()
         {
-
             var user = Environment.UserName;
             var maquina = Environment.MachineName;
             var diretorio = Environment.CurrentDirectory;
@@ -444,16 +445,13 @@ namespace Simplificador
 
 
             Console.Clear();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("---------- SimpliFração ---------- ");
+            Console.WriteLine("---------- SimpliFração ----------\r\n");
 
-            var mensagem = $"Usuário: {user} \nMáquina: {maquina} \nCaminho: {diretorio}\nOS: {os} \nVersão Assembly: {versionAss}\nProgramador: {programador}";
-
+            var mensagem = $"Usuário: {user} \n\nMáquina: {maquina} \n\nCaminho: {diretorio}\n\nOS: {os} \n\nVersão Assembly: {versionAss}\n\nProgramador: {programador}";
             Console.WriteLine(mensagem);
 
             Console.WriteLine("\r\nPresione Enter para continuar!");
             Console.ReadLine();
-            Console.ResetColor();
 
             //*** Limpar tela
             Metodo = string.Empty;
