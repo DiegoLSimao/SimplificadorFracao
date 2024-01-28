@@ -408,7 +408,6 @@ namespace Simplificador
             if (denominador == numerador) throw new Exception("Numerador Igual ao Denominador, Resultado é 1");
         }
  
-    
         static void Informacoes()
         {
             Console.Clear();
