@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Diagnostics;
+using AutoUpdaterDotNET;
+using System.IO;
+using System.Xml.Linq;
 
 namespace Simplificador
 {
@@ -25,6 +28,9 @@ namespace Simplificador
     
         static void Main(string[] args)
         {
+#if !DEBUG
+            VerificarAtualizacao();
+#endif
             while (!Loop)
             {
                 switch (Estado)
@@ -79,6 +85,38 @@ namespace Simplificador
             }// fim while loop
 
         }// fim main
+
+        private static void VerificarAtualizacao()
+        {
+            try
+            {
+                string servidor = string.Concat("file://", LerConfigAtualizacao());
+                AutoUpdater.RunUpdateAsAdmin = false;
+                AutoUpdater.Start(servidor);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Não foi possível verificar atualização!!!\r\n{ex.Message}");
+            }
+           
+        }
+
+        private static string LerConfigAtualizacao()
+        {
+            try
+            {
+                // Combine o diretório do executável com o nome do arquivo
+                string caminhoArquivoConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.xml");
+
+                XDocument doc = XDocument.Load(caminhoArquivoConfig);
+                return doc.Element("Configuracao").Element("CaminhoAtualizacao").Value;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao ler o arquivo de configuração: {ex.Message}");
+                return string.Empty;
+            }
+        }
 
         static void RealizarCalculo()
         {
@@ -292,7 +330,7 @@ namespace Simplificador
         static void GerenciadorLoop()
         {
             Console.WriteLine("");
-            Console.Write("Repetir Operação? Tecle: ([S]im / [N]ão / [L]impar Tela /[T]rocar Método) / [F]echar: ");
+            Console.Write("Repetir Operação? Tecle: ([S]im / [N]ão / [L]impar Tela / [T]rocar Método) / [F]echar: ");
             string repetir = Console.ReadLine();
             if (string.Equals(repetir, "s") || string.Equals(repetir, "S"))
             {
