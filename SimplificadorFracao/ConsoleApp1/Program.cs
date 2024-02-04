@@ -537,8 +537,12 @@ namespace Simplificador
             var mensagem = $"Usuário: {user} \n\nMáquina: {maquina} \n\nCaminho: {diretorio}\n\nOS: {os} \n\nVersão Assembly: {versionAss}\n\nProgramador: {programador}";
             Console.WriteLine(mensagem);
 
+            Console.WriteLine("Repositório: https://github.com/DiegoLSimao/SimplificadorFracao");
+
             Console.WriteLine("\r\nPresione Enter para continuar!");
             Console.ReadLine();
+
+            
 
             //*** Limpar tela
             Metodo = string.Empty;
