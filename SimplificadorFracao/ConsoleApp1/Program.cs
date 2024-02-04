@@ -8,6 +8,7 @@ using System.Diagnostics;
 using AutoUpdaterDotNET;
 using System.IO;
 using System.Xml.Linq;
+using SimplificadorFracao;
 
 namespace Simplificador
 {
@@ -131,27 +132,17 @@ namespace Simplificador
         {
             double valorOriginal = (double)Numerador / (double)Denominador;
             bool encontrouSolucao = false;
+            bool exibiuMelhorSolucao = false;
             int MelhorNumerador = 0;
             int MelhorDenominador = 0;
             double MelhorErroPercentual = 0.0;
+            List<Numero> listNumeros = new List<Numero>();
 
-            List<int> MelhoresNumeradores = new List<int>();
-            List<int> MelhoresDenominadores = new List<int>();
-            List<double> MelhoresErroPercentual = new List<double>();
-
-
-            //*** Se entrada numerador e denominador for par simplifica antes do calculo de erro
-            while ((numerador % 2 == 0) && (denominador % 2 == 0))
-            {
-                numerador /= 2;
-                denominador /= 2;
-            }//fim while
 
             #region PROCESSAMENTO DO ERRO
             //*** Processamento de erro
             for (int divisor = 2; divisor <= denominador; divisor++)
             {
-                
                 if (numerador == 1)
                     break;
 
@@ -160,19 +151,14 @@ namespace Simplificador
                 double novoValor = (double)novoNumerador / novoDenominador;
                 double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
 
+
                 if (erroPercentual <= percentualErro)
                 {
-                    //*** Lista com todos os resultados dentro do percentual desejado
-                    MelhoresNumeradores.Add(novoNumerador);
-                    MelhoresDenominadores.Add(novoDenominador);
-                    MelhoresErroPercentual.Add(erroPercentual);
-
-
-                    //*** Armazena a ultima solução dentro do percentual desejado
                     encontrouSolucao = true;
-                    MelhorNumerador = novoNumerador;
-                    MelhorDenominador = novoDenominador;
-                    MelhorErroPercentual = erroPercentual;
+
+                    //*** Lista com todos os resultados dentro do percentual desejado
+                    Numero num = new Numero(novoNumerador, novoDenominador, erroPercentual);
+                    listNumeros.Add(num);
 
                     //*** Se numerador for igual a 1 finaliza
                     if (novoNumerador == 1)
@@ -182,77 +168,85 @@ namespace Simplificador
             #endregion
 
 
-
-
             //***Se possuir mais de uma solução faz os cálculos de menor numerador e denominador e menor erro percentual
-            if ((encontrouSolucao==true) && (MelhoresErroPercentual.Count > 1))
+            if ((encontrouSolucao==true) && (listNumeros.Count > 0))
             {
                 #region CALCULO MENOR NUMERADOR E DENOMINADOR
-                //MENOR NUmerador e Denominador
-                Console.WriteLine("");
-                Console.WriteLine("");
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine($"---------------------------------------------");
-                Console.Write($"------- MENOR NUMERADOR E DENOMINADOR -------");
-                int menorNumerador=65535, menorDenominador=65535;
-                int i = 0, j = 0;
+                int menorNumDen = 0;
                 //***Encontra menor Numerador E menor Denominador
-                for (i = 0; i < MelhoresNumeradores.Count; i++)
+                for (int i = 0; i < listNumeros.Count; i++)
                 {
-                    if((MelhoresNumeradores[i] < menorNumerador) && (MelhoresDenominadores[i] < menorDenominador))
+                    if ((listNumeros[i].Numerador < 65536) && (listNumeros[i].Denominador < 65536))
                     {
-                        menorNumerador = MelhoresNumeradores[i];
-                        menorDenominador = MelhoresDenominadores[i];
-                        j=i; // salva em j o indice do melhor resultado
+                        menorNumDen = i; // salva o indice do melhor resultado
                     }
                 }
-
-                //*** Se numerador e denominador forem par simplifica
-                while ((menorNumerador % 2 == 0) && (menorDenominador % 2 == 0))
-                {
-                    menorNumerador /= 2;
-                    menorDenominador /= 2;
-                }//fim while
-                Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, menorNumerador, menorDenominador, MelhoresErroPercentual[j]);
                 #endregion
 
                 #region CALCULO DO MENOR ERRO PERCENTUAL
-                // *** MENOR ERRO Percentual
-                Console.WriteLine("");
-                Console.WriteLine("");
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine($"---------------------------------------------");
-                Console.Write($"---------- MENOR ERRO PERCENTUAL ------------");
                 double menorErro = percentualErro;
-                j = 0;
-                for (i = 0; i < MelhoresErroPercentual.Count; i++)
+                int menorPercent = 0;
+
+                //*** Encontra menor erro percentual na lista
+                for (int i = 0; i < listNumeros.Count; i++)
                 {
-                    if ((MelhoresNumeradores[i] < 65535) && (MelhoresDenominadores[i] < 65535))
+                    if ((listNumeros[i].Numerador < 65536) && (listNumeros[i].Denominador < 65536))
                     {
-                        if (MelhoresErroPercentual[i] < menorErro)
+                        if (listNumeros[i].ErroPercentual < menorErro)
                         {
-                            menorErro = MelhoresErroPercentual[i];
-                            j = i; // salva em j o indice do melhor resultado
+                            menorErro = listNumeros[i].ErroPercentual;
+                            menorPercent = i; // salva o indice do melhor resultado
                         }
                     }
                 }
-
-                //*** Se numerador e denominador forem par simplifica
-                while ((MelhoresNumeradores[j] % 2 == 0) && (MelhoresDenominadores[j] % 2 == 0))
-                {
-                    MelhoresNumeradores[j] /= 2;
-                    MelhoresDenominadores[j] /= 2;
-                }//fim while
-                //*** Imprime Resultado
-                Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, MelhoresNumeradores[j], MelhoresDenominadores[j], menorErro);
                 #endregion
+
+                #region EXIBIÇÃO PARA O USUÁRIO
+                bool ExibirUnico = (listNumeros[menorNumDen].ErroPercentual == listNumeros[menorPercent].ErroPercentual);
+
+                if(ExibirUnico)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write($"---------------------------------------------");
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
+                }
+                else
+                {
+                    //Menor numerador e Denominador
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"---------------------------------------------");
+                    Console.Write($"------- MENOR NUMERADOR E DENOMINADOR -------");
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
+
+
+                    //Menor Erro Percentual
+                    Console.WriteLine("");
+                    Console.WriteLine("");
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine($"---------------------------------------------");
+                    Console.Write($"---------- MENOR ERRO PERCENTUAL ------------");
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorPercent].Numerador, listNumeros[menorPercent].Denominador, listNumeros[menorPercent].ErroPercentual);
+
+                }
+                #endregion
+
             }
             else
             {
+                //*** Se não encontrou uma solução apresenta o valor informado somente
                 Console.WriteLine("");
-                //*** ultima solução encontrada
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.Write($"---------------------------------------------");
                 Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
             }
+
+            //*** Limpa lista para o Garbage Colector
+            listNumeros.Clear();
+            listNumeros = null;
         }
       
         static void EscreverCabecalho()
@@ -338,6 +332,14 @@ namespace Simplificador
                 Denominador = Convert.ToInt32(den);
                 PercentualErro = Convert.ToDouble(erro);
                 Check_EntradasBurras(Numerador, Denominador);
+
+                //*** Se entrada numerador e denominador for par simplifica
+                while ((Numerador % 2 == 0) && (Denominador % 2 == 0))
+                {
+                    Numerador /= 2;
+                    Denominador /= 2;
+                }//fim while
+
                 ret = true;
             }
             catch (Exception ex)
