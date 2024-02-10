@@ -14,8 +14,6 @@ namespace Simplificador
 {
     class Program
     {
-        //todo implementar atualizador automático
-
         static bool Cabecalho = false;
         static bool Loop = false;
         static string Metodo = string.Empty;
@@ -29,9 +27,17 @@ namespace Simplificador
     
         static void Main(string[] args)
         {
-#if !DEBUG
-            VerificarAtualizacao();
-#endif
+            try
+            {
+                VerificarAtualizacao();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Não foi possível verificar atualização!!!\r\n{ex.Message}");
+            }
+
+
+            //*********************Loop Principal
             while (!Loop)
             {
                 switch (Estado)
@@ -89,17 +95,9 @@ namespace Simplificador
 
         private static void VerificarAtualizacao()
         {
-            try
-            {
                 string servidor = string.Concat("file://", LerConfigAtualizacao());
                 AutoUpdater.RunUpdateAsAdmin = false;
                 AutoUpdater.Start(servidor);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Não foi possível verificar atualização!!!\r\n{ex.Message}");
-            }
-           
         }
 
         private static string LerConfigAtualizacao()
@@ -127,12 +125,10 @@ namespace Simplificador
                 FracaoSimplificada_MenorFracao(Numerador, Denominador);
         }
 
-
         static void FracaoSimplificada_MenorErro(int numerador, int denominador, double percentualErro)
         {
             double valorOriginal = (double)Numerador / (double)Denominador;
             bool encontrouSolucao = false;
-            bool exibiuMelhorSolucao = false;
             int MelhorNumerador = 0;
             int MelhorDenominador = 0;
             double MelhorErroPercentual = 0.0;
@@ -210,7 +206,7 @@ namespace Simplificador
                     Console.WriteLine("");
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.Write($"---------------------------------------------");
-                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador,  listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
                 }
                 else
                 {
@@ -220,7 +216,7 @@ namespace Simplificador
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine($"---------------------------------------------");
                     Console.Write($"------- MENOR NUMERADOR E DENOMINADOR -------");
-                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, listNumeros[menorNumDen].Numerador, listNumeros[menorNumDen].Denominador, listNumeros[menorNumDen].ErroPercentual);
 
 
                     //Menor Erro Percentual
@@ -229,7 +225,7 @@ namespace Simplificador
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine($"---------------------------------------------");
                     Console.Write($"---------- MENOR ERRO PERCENTUAL ------------");
-                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, listNumeros[menorPercent].Numerador, listNumeros[menorPercent].Denominador, listNumeros[menorPercent].ErroPercentual);
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, listNumeros[menorPercent].Numerador, listNumeros[menorPercent].Denominador, listNumeros[menorPercent].ErroPercentual);
 
                 }
                 #endregion
@@ -241,12 +237,11 @@ namespace Simplificador
                 Console.WriteLine("");
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write($"---------------------------------------------");
-                Imprimir_Resultados(encontrouSolucao, numerador, denominador, null, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
+                Imprimir_Resultados(encontrouSolucao, numerador, denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
             }
 
             //*** Limpa lista para o Garbage Colector
             listNumeros.Clear();
-            listNumeros = null;
         }
       
         static void EscreverCabecalho()
@@ -276,7 +271,7 @@ namespace Simplificador
                 //*** Método maior precisão
                 if (string.Equals(Metodo, "1"))
                 {
-                    Console.WriteLine("Método Maior Precisão selecionado!");
+                    Console.WriteLine("Método Menor Fração selecionado!");
                     MenorErro = false;
                     Console.WriteLine("===============================================================");
                     Console.WriteLine("");
@@ -420,15 +415,11 @@ namespace Simplificador
 
         static void FracaoSimplificada_MenorFracao(int numerador, int denominador)
         {
-            Stopwatch sw = new Stopwatch();
             double valorOriginal = (double)numerador / denominador;
             bool encontrouSolucao = false;
             int MelhorNumerador = 0;
             int MelhorDenominador = 0;
             double MelhorErroPercentual = 100.0;
-
-
-            sw.Start(); //Inicia contagem de tempo
 
             //*** Cálculo principal
             for (int divisor = 2; divisor <= denominador; divisor++)
@@ -451,13 +442,11 @@ namespace Simplificador
                      break;
                 }
             }
-
-            sw.Stop(); // Finaliza contagem de tempo
-            Imprimir_Resultados(encontrouSolucao, numerador ,denominador, sw, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
+            Imprimir_Resultados(encontrouSolucao, numerador ,denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
 
         }
 
-        static void Imprimir_Resultados(bool encontrouSolucao, int numerador, int denominador, Stopwatch sw, int MelhorNumerador, int MelhorDenominador,double MelhorErroPercentual)
+        static void Imprimir_Resultados(bool encontrouSolucao, int numerador, int denominador, int MelhorNumerador, int MelhorDenominador,double MelhorErroPercentual)
         {
             Console.WriteLine("");
             if (encontrouSolucao)
@@ -470,7 +459,7 @@ namespace Simplificador
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"Inc. Orig.: {(double)numerador / denominador}");
                 Console.WriteLine($"Inc. Erro : {(double)MelhorNumerador / MelhorDenominador}");
-                Console.WriteLine($"Erro percentual: {MelhorErroPercentual.ToString("0.0000")}%");
+                Console.WriteLine($"Erro percentual: {MelhorErroPercentual:0.0000}%");
                 Console.WriteLine("");
                 Console.WriteLine($"Fração simplificada: {MelhorNumerador}/{MelhorDenominador}");
 
@@ -511,7 +500,7 @@ namespace Simplificador
 
             //*** informações
             Console.WriteLine("Opção 1, Menor Fração:\r\nO usuário deve informar o numerador e denominador da fração e o sistema\r\nirá simplificar e encontrar a menor fração mais precisa possível.\r\nO usuário deve analizar o percentual de erro e decidir se faz sentido utilizar ou não!\r\n\r\n");
-            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual de erro admitido.\r\n\r\n");
+            Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual permitido e também se houver apresentará a fração simplificada com maior precisão\r\n\r\n");
             Console.WriteLine("Obs.: Numerador e denominador obrigatóriamente deve ser números inteiro.\r\nPercentual aceita casas decimais no método Menor Erro.\r\n\r\n");
             Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será aprensetada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n\r\n");
             

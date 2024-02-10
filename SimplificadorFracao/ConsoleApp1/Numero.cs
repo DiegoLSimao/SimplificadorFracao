@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SimplificadorFracao
 {
@@ -14,6 +10,7 @@ namespace SimplificadorFracao
         public int MaximoDivisorComum;
         public int MinimoMultiploComum;
         public double ErroPercentual;
+        
 
         //*** Construtores
         public Numero()
@@ -58,9 +55,6 @@ namespace SimplificadorFracao
         {
             return Math.Abs(a * b) / mdc;
         }
-
-
-
 
     }
 }
