@@ -95,7 +95,7 @@ namespace Simplificador
 
         private static void VerificarAtualizacao()
         {
-                string servidor = string.Concat("file://", LerConfigAtualizacao());
+                string servidor = LerConfigAtualizacao();
                 AutoUpdater.RunUpdateAsAdmin = false;
                 AutoUpdater.Start(servidor);
         }
@@ -188,10 +188,13 @@ namespace Simplificador
                 {
                     if ((listNumeros[i].Numerador < 65536) && (listNumeros[i].Denominador < 65536))
                     {
-                        if (listNumeros[i].ErroPercentual < menorErro)
+                        if (listNumeros[i].ErroPercentual <= menorErro)
                         {
-                            menorErro = listNumeros[i].ErroPercentual;
-                            menorPercent = i; // salva o indice do melhor resultado
+                            if ((listNumeros[i].Numerador <= listNumeros[menorPercent].Numerador) || (listNumeros[i].Denominador <= listNumeros[menorPercent].Denominador))
+                            {
+                                menorErro = listNumeros[i].ErroPercentual;
+                                menorPercent = i; // salva o indice do melhor resultado
+                            }
                         }
                     }
                 }
@@ -502,7 +505,7 @@ namespace Simplificador
             Console.WriteLine("Opção 1, Menor Fração:\r\nO usuário deve informar o numerador e denominador da fração e o sistema\r\nirá simplificar e encontrar a menor fração mais precisa possível.\r\nO usuário deve analizar o percentual de erro e decidir se faz sentido utilizar ou não!\r\n\r\n");
             Console.WriteLine("Opção 2, Menor Erro Admitido:\r\nO usuário deve informar o numerador e o denominador da fração\r\nem seguida o percentual de erro admitido (Aceita casas decimais). O sistema irá calcular\r\na menor fração dentro do percentual permitido e também se houver apresentará a fração simplificada com maior precisão\r\n\r\n");
             Console.WriteLine("Obs.: Numerador e denominador obrigatóriamente deve ser números inteiro.\r\nPercentual aceita casas decimais no método Menor Erro.\r\n\r\n");
-            Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será aprensetada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n\r\n");
+            Console.WriteLine("No Resultado será apresentado a inclinação da reta original e a inclinação da reta considerando o erro percentual.\r\nA fração será apresentada no formato [a/b], onde [a] é o numerador (multiplica) e [b] é o denominador (divide).\r\n\r\n");
             
             Console.WriteLine("Presione Enter para continuar!");
             Console.ReadLine();
