@@ -13,7 +13,7 @@ Este é um sistema simples de simplificação de frações desenvolvido para enc
 
 O sistema utiliza a seguinte dependência para garantir atualizações automáticas futuras:
 
-### [Autoupdater](https://github.com/ravibpatel/AutoUpdater.NET)
+### [AutoUpdater.NET](https://github.com/ravibpatel/AutoUpdater.NET)
 
 O Autoupdater é uma biblioteca que gerencia atualizações automáticas do sistema. Isso garante que o software permaneça atualizado com as últimas melhorias e correções de bugs sem a necessidade de intervenção manual.
 
