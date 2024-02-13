@@ -377,7 +377,7 @@ namespace Simplificador
         static void GerenciadorLoop()
         {
             Console.WriteLine("");
-            Console.Write("Repetir Operação? Tecle: ([S]im / [N]ão / [L]impar Tela / [T]rocar Método) / [F]echar: ");
+            Console.Write("Repetir Operação? Tecle: ([S]im / [N]ão / [L]impar Tela / [T]rocar Método / [F]echar): ");
             string repetir = Console.ReadLine();
             if (string.Equals(repetir, "s") || string.Equals(repetir, "S"))
             {
