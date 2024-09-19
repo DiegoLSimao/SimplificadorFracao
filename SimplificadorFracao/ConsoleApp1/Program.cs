@@ -129,7 +129,7 @@ namespace Simplificador
 
         static void FracaoSimplificada_MenorErro(uint numerador, uint denominador, double percentualErro)
         {
-            //if (percentualErro == 0.00) percentualErro = 0.0001;// Não pode ser zero senão não retorna nenhum resultado
+            if (percentualErro == 0.00) percentualErro = 0.0001;// Não pode ser zero senão não retorna nenhum resultado
 
             Stopwatch sw = Stopwatch.StartNew();
             Numero numRecebido = new Numero(numerador, denominador, percentualErro);
