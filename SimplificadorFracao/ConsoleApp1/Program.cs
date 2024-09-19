@@ -9,6 +9,8 @@ using AutoUpdaterDotNET;
 using System.IO;
 using System.Xml.Linq;
 using SimplificadorFracao;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Simplificador
 {
@@ -20,8 +22,8 @@ namespace Simplificador
         static bool MenorErro = true;
         static byte Estado = 0;
 
-        static int Numerador;
-        static int Denominador;
+        static uint Numerador;
+        static uint Denominador;
         static double PercentualErro;
 
     
@@ -125,25 +127,38 @@ namespace Simplificador
                 FracaoSimplificada_MenorFracao(Numerador, Denominador);
         }
 
-        static void FracaoSimplificada_MenorErro(int numerador, int denominador, double percentualErro)
+        static void FracaoSimplificada_MenorErro(uint numerador, uint denominador, double percentualErro)
         {
+            //if (percentualErro == 0.00) percentualErro = 0.0001;// Não pode ser zero senão não retorna nenhum resultado
+
+            Stopwatch sw = Stopwatch.StartNew();
+            Numero numRecebido = new Numero(numerador, denominador, percentualErro);
+
             double valorOriginal = (double)Numerador / (double)Denominador;
             bool encontrouSolucao = false;
-            int MelhorNumerador = 0;
-            int MelhorDenominador = 0;
+            uint MelhorNumerador = 0;
+            uint MelhorDenominador = 0;
             double MelhorErroPercentual = 0.0;
             List<Numero> listNumeros = new List<Numero>();
 
+            int tempo_seg = 0;
 
             #region PROCESSAMENTO DO ERRO
             //*** Processamento de erro
-            for (int divisor = 2; divisor <= denominador; divisor++)
+            for (uint divisor = 2; divisor <= denominador; divisor++)
             {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    Console.Write($"|");
+                    sw.Restart();
+                    tempo_seg++;
+                }
+
                 if (numerador == 1)
                     break;
 
-                int novoNumerador = numerador / divisor;
-                int novoDenominador = denominador / divisor;
+                uint novoNumerador = numerador / divisor;
+                uint novoDenominador = denominador / divisor;
                 double novoValor = (double)novoNumerador / novoDenominador;
                 double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
 
@@ -161,6 +176,8 @@ namespace Simplificador
                         break;
                 }
             }
+            if(tempo_seg > 0)
+                Console.WriteLine($"{tempo_seg*5} s");
             #endregion
 
 
@@ -237,10 +254,8 @@ namespace Simplificador
             else
             {
                 //*** Se não encontrou uma solução apresenta o valor informado somente
-                Console.WriteLine("");
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.Write($"---------------------------------------------");
-                Imprimir_Resultados(encontrouSolucao, numerador, denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
+                Console.WriteLine("Nenhum resultado! Irei tentar pelo método de Menor Fração!");
+                FracaoSimplificada_MenorFracao(numerador, denominador);
             }
 
             //*** Limpa lista para o Garbage Colector
@@ -326,8 +341,8 @@ namespace Simplificador
             bool ret;
             try
             {
-                Numerador = Convert.ToInt32(num);
-                Denominador = Convert.ToInt32(den);
+                Numerador = Convert.ToUInt32(num);
+                Denominador = Convert.ToUInt32(den);
                 PercentualErro = Convert.ToDouble(erro);
                 Check_EntradasBurras(Numerador, Denominador);
 
@@ -416,19 +431,31 @@ namespace Simplificador
             }
         }
 
-        static void FracaoSimplificada_MenorFracao(int numerador, int denominador)
+        static void FracaoSimplificada_MenorFracao(uint numerador, uint denominador)
         {
+            Stopwatch sw = Stopwatch.StartNew();
+            Numero numRecebido = new Numero(numerador, denominador, 0);
+
             double valorOriginal = (double)numerador / denominador;
             bool encontrouSolucao = false;
-            int MelhorNumerador = 0;
-            int MelhorDenominador = 0;
+            uint MelhorNumerador = 0;
+            uint MelhorDenominador = 0;
             double MelhorErroPercentual = 100.0;
 
+            int tempo_seg = 0;
+
             //*** Cálculo principal
-            for (int divisor = 2; divisor <= denominador; divisor++)
+            for (uint divisor = 2; divisor <= denominador; divisor++)
             {
-                int novoNumerador = numerador / divisor;
-                int novoDenominador = denominador / divisor;
+                if (sw.ElapsedMilliseconds>5000)
+                {
+                    Console.Write($"|");
+                    sw.Restart();
+                    tempo_seg++;
+                }
+
+                uint novoNumerador = numerador / divisor;
+                uint novoDenominador = denominador / divisor;
                 double novoValor = (double)novoNumerador / novoDenominador;
 
                 double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
@@ -445,11 +472,13 @@ namespace Simplificador
                      break;
                 }
             }
+            if (tempo_seg > 0)
+                Console.WriteLine($"{tempo_seg * 5} s");
             Imprimir_Resultados(encontrouSolucao, numerador ,denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
 
         }
 
-        static void Imprimir_Resultados(bool encontrouSolucao, int numerador, int denominador, int MelhorNumerador, int MelhorDenominador,double MelhorErroPercentual)
+        static void Imprimir_Resultados(bool encontrouSolucao, uint numerador, uint denominador, uint MelhorNumerador, uint MelhorDenominador,double MelhorErroPercentual)
         {
             Console.WriteLine("");
             if (encontrouSolucao)
@@ -488,7 +517,7 @@ namespace Simplificador
             }
         }
 
-        static void Check_EntradasBurras(int numerador, int denominador)
+        static void Check_EntradasBurras(uint numerador, uint denominador)
         {
             if (numerador == 1)     throw new Exception("Sem Simplificação! Numerador = 1.");
             if (numerador == 0)     throw new Exception("Sem Simplificação! Numerador = 0, Resultado Sempre Zero!");

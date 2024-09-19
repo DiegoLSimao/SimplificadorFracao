@@ -4,11 +4,11 @@ namespace SimplificadorFracao
 {
     internal class Numero
     {
-        public int Numerador;
-        public int Denominador;
+        public uint Numerador;
+        public uint Denominador;
         public double CoeficienteLinear;
-        public int MaximoDivisorComum;
-        public int MinimoMultiploComum;
+        public uint MaximoDivisorComum;
+        public uint MinimoMultiploComum;
         public double ErroPercentual;
         
 
@@ -19,7 +19,7 @@ namespace SimplificadorFracao
             Denominador = 1;
             CoeficienteLinear = 0.0;
         }
-        public Numero(int numerador, int denominador, double erroPercentual)
+        public Numero(uint numerador, uint denominador, double erroPercentual)
         {
             //*** Se entrada numerador e denominador for par simplifica
             while ((numerador % 2 == 0) && (denominador % 2 == 0))
@@ -37,12 +37,12 @@ namespace SimplificadorFracao
             ErroPercentual = erroPercentual;
         }
 
-        private int CalcularMDC(int a, int b)
+        private uint CalcularMDC(uint a, uint b)
         {
             //*** Máximo Divisor Comum, ALgoritimo de euclides
             while (b != 0)
             {
-                int temp = b;
+                uint temp = b;
                 b = a % b;
                 a = temp;
             }
@@ -51,9 +51,9 @@ namespace SimplificadorFracao
 
         }
 
-        private int CalcularMMC(int a, int b, int mdc)
+        private uint CalcularMMC(uint a, uint b, uint mdc)
         {
-            return Math.Abs(a * b) / mdc;
+            return (uint)Math.Abs(a * b) / mdc;
         }
 
     }
