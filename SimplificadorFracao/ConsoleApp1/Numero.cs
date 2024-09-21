@@ -21,13 +21,6 @@ namespace SimplificadorFracao
         }
         public Numero(uint numerador, uint denominador, double erroPercentual)
         {
-            //*** Se entrada numerador e denominador for par simplifica
-            while ((numerador % 2 == 0) && (denominador % 2 == 0))
-            {
-                numerador /= 2;
-                denominador /= 2;
-            }//fim while
-
             //***Atribui
             Numerador = numerador;
             Denominador = denominador;

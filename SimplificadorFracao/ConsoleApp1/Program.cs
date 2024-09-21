@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using SimplificadorFracao;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Simplificador
 {
@@ -129,36 +130,35 @@ namespace Simplificador
 
         static void FracaoSimplificada_MenorErro(uint numerador, uint denominador, double percentualErro)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             if (percentualErro == 0.00) percentualErro = 0.0001;// Não pode ser zero senão não retorna nenhum resultado
 
-            Stopwatch sw = Stopwatch.StartNew();
+            #region Simplifica se possível
             Numero numRecebido = new Numero(numerador, denominador, percentualErro);
 
+            if (numRecebido.MaximoDivisorComum > 1)
+            {
+                //simplifica pelo MDC
+                numerador /= numRecebido.MaximoDivisorComum;
+                denominador /= numRecebido.MaximoDivisorComum;
+            }
+            #endregion
+
+            #region Processamento do cálculo
+            
             double valorOriginal = (double)Numerador / (double)Denominador;
             bool encontrouSolucao = false;
-            uint MelhorNumerador = 0;
-            uint MelhorDenominador = 0;
-            double MelhorErroPercentual = 0.0;
             List<Numero> listNumeros = new List<Numero>();
 
-            int tempo_seg = 0;
 
-            #region PROCESSAMENTO DO ERRO
-            //*** Processamento de erro
-            for (uint divisor = 2; divisor <= denominador; divisor++)
+            Console.Write("Processando:");
+            Parallel.For(1L, denominador, (i, loopState) =>
             {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    Console.Write($"|");
-                    sw.Restart();
-                    tempo_seg++;
-                }
-
                 if (numerador == 1)
-                    break;
+                    loopState.Break();
 
-                uint novoNumerador = numerador / divisor;
-                uint novoDenominador = denominador / divisor;
+                uint novoNumerador = numerador / (uint)i;
+                uint novoDenominador = denominador / (uint)i;
                 double novoValor = (double)novoNumerador / novoDenominador;
                 double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
 
@@ -173,12 +173,12 @@ namespace Simplificador
 
                     //*** Se numerador for igual a 1 finaliza
                     if (novoNumerador == 1)
-                        break;
+                        loopState.Break();
                 }
-            }
-            if(tempo_seg > 0)
-                Console.WriteLine($"{tempo_seg*5} s");
+            });
+            Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
             #endregion
+
 
 
             //***Se possuir mais de uma solução faz os cálculos de menor numerador e denominador e menor erro percentual
@@ -189,7 +189,7 @@ namespace Simplificador
                 //***Encontra menor Numerador E menor Denominador
                 for (int i = 0; i < listNumeros.Count; i++)
                 {
-                    if ((listNumeros[i].Numerador < 65536) && (listNumeros[i].Denominador < 65536))
+                    if ((listNumeros[i]?.Numerador < 65536) && (listNumeros[i]?.Denominador < 65536))
                     {
                         menorNumDen = i; // salva o indice do melhor resultado
                     }
@@ -203,11 +203,11 @@ namespace Simplificador
                 //*** Encontra menor erro percentual na lista
                 for (int i = 0; i < listNumeros.Count; i++)
                 {
-                    if ((listNumeros[i].Numerador < 65536) && (listNumeros[i].Denominador < 65536))
+                    if ((listNumeros[i]?.Numerador < 65536) && (listNumeros[i]?.Denominador < 65536))
                     {
-                        if (listNumeros[i].ErroPercentual <= menorErro)
+                        if (listNumeros[i]?.ErroPercentual <= menorErro)
                         {
-                            if ((listNumeros[i].Numerador <= listNumeros[menorPercent].Numerador) || (listNumeros[i].Denominador <= listNumeros[menorPercent].Denominador))
+                            if ((listNumeros[i]?.Numerador <= listNumeros[menorPercent]?.Numerador) || (listNumeros[i]?.Denominador <= listNumeros[menorPercent]?.Denominador))
                             {
                                 menorErro = listNumeros[i].ErroPercentual;
                                 menorPercent = i; // salva o indice do melhor resultado
@@ -218,7 +218,7 @@ namespace Simplificador
                 #endregion
 
                 #region EXIBIÇÃO PARA O USUÁRIO
-                bool ExibirUnico = (listNumeros[menorNumDen].ErroPercentual == listNumeros[menorPercent].ErroPercentual);
+                bool ExibirUnico = (listNumeros[menorNumDen]?.ErroPercentual == listNumeros[menorPercent]?.ErroPercentual);
 
                 if(ExibirUnico)
                 {
@@ -253,9 +253,19 @@ namespace Simplificador
             }
             else
             {
-                //*** Se não encontrou uma solução apresenta o valor informado somente
-                Console.WriteLine("Nenhum resultado! Irei tentar pelo método de Menor Fração!");
-                FracaoSimplificada_MenorFracao(numerador, denominador);
+                //*** Se foi simplificado e numerador ou denominador ficou igual a 1
+                if (numerador == 1 || denominador == 1)
+                {
+                    Imprimir_Resultados(encontrouSolucao, numerador, denominador, 0, 0, 0);
+                }
+                else
+                {
+                    //*** Se não encontrou uma solução apresenta o valor informado somente
+                    Console.WriteLine("Nenhum resultado! Irei tentar pelo método de Menor Fração!");
+                    FracaoSimplificada_MenorFracao(numerador, denominador);
+                }
+
+                
             }
 
             //*** Limpa lista para o Garbage Colector
@@ -345,14 +355,6 @@ namespace Simplificador
                 Denominador = Convert.ToUInt32(den);
                 PercentualErro = Convert.ToDouble(erro);
                 Check_EntradasBurras(Numerador, Denominador);
-
-                //*** Se entrada numerador e denominador for par simplifica
-                while ((Numerador % 2 == 0) && (Denominador % 2 == 0))
-                {
-                    Numerador /= 2;
-                    Denominador /= 2;
-                }//fim while
-
                 ret = true;
             }
             catch (Exception ex)
@@ -434,7 +436,19 @@ namespace Simplificador
         static void FracaoSimplificada_MenorFracao(uint numerador, uint denominador)
         {
             Stopwatch sw = Stopwatch.StartNew();
+
+            #region Simplifica se possível
             Numero numRecebido = new Numero(numerador, denominador, 0);
+
+            if (numRecebido.MaximoDivisorComum > 1)
+            {
+                //simplifica pelo MDC
+                numerador /= numRecebido.MaximoDivisorComum;
+                denominador /= numRecebido.MaximoDivisorComum;
+            }
+            #endregion
+
+            
 
             double valorOriginal = (double)numerador / denominador;
             bool encontrouSolucao = false;
@@ -442,40 +456,34 @@ namespace Simplificador
             uint MelhorDenominador = 0;
             double MelhorErroPercentual = 100.0;
 
-            int tempo_seg = 0;
-
-            //*** Cálculo principal
-            for (uint divisor = 2; divisor <= denominador; divisor++)
+            #region Processamento do Cáculo
+            Console.Write($"Processando: ");
+            // Defina o que será feito em cada iteração
+            Parallel.For(2L, denominador, (i, loopState) =>
             {
-                if (sw.ElapsedMilliseconds>5000)
-                {
-                    Console.Write($"|");
-                    sw.Restart();
-                    tempo_seg++;
-                }
-
-                uint novoNumerador = numerador / divisor;
-                uint novoDenominador = denominador / divisor;
+                uint novoNumerador = numerador / (uint)i;
+                uint novoDenominador = denominador / (uint)i;
                 double novoValor = (double)novoNumerador / novoDenominador;
 
                 double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
 
                 if (erroPercentual <= MelhorErroPercentual && novoNumerador <= 65535)
-                { 
+                {
                     encontrouSolucao = true;
                     MelhorNumerador = novoNumerador;
                     MelhorDenominador = novoDenominador;
                     MelhorErroPercentual = erroPercentual;
-
-                    //*** Se novo numerador for igual a 1 finaliza
-                    if (novoNumerador == 1)
-                     break;
                 }
-            }
-            if (tempo_seg > 0)
-                Console.WriteLine($"{tempo_seg * 5} s");
-            Imprimir_Resultados(encontrouSolucao, numerador ,denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
 
+                //*** Se novo numerador for igual a 1 finaliza
+                if (novoNumerador == 1)
+                    loopState.Break();
+
+            });
+            Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
+            #endregion 
+
+            Imprimir_Resultados(encontrouSolucao, numerador ,denominador, MelhorNumerador, MelhorDenominador, MelhorErroPercentual);
         }
 
         static void Imprimir_Resultados(bool encontrouSolucao, uint numerador, uint denominador, uint MelhorNumerador, uint MelhorDenominador,double MelhorErroPercentual)
