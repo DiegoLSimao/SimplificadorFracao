@@ -67,6 +67,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Atualizador.cs" />
+    <Compile Include="LerXML.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="Numero.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

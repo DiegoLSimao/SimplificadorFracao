@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Diagnostics;
-using AutoUpdaterDotNET;
-using System.IO;
-using System.Xml.Linq;
+﻿using AutoUpdaterDotNET;
 using SimplificadorFracao;
-using System.ComponentModel;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Simplificador
 {
+
     class Program
     {
         static bool Cabecalho = false;
@@ -27,17 +23,11 @@ namespace Simplificador
         static uint Denominador;
         static double PercentualErro;
 
-    
         static void Main(string[] args)
         {
-            try
-            {
-                VerificarAtualizacao();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Não foi possível verificar atualização!!!\r\n{ex.Message}");
-            }
+            LogHelper.CriarArquivoLog();
+            Atualizador.VerificarAtualizacao();
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
 
             //*********************Loop Principal
@@ -47,6 +37,7 @@ namespace Simplificador
                 {
                     case 0:
                         {
+                            LogHelper.EscreverLog("Ola!!!");
                             if (!Cabecalho) EscreverCabecalho();
                             Estado = 1;
                             break;
@@ -96,29 +87,6 @@ namespace Simplificador
 
         }// fim main
 
-        private static void VerificarAtualizacao()
-        {
-                string servidor = LerConfigAtualizacao();
-                AutoUpdater.RunUpdateAsAdmin = false;
-                AutoUpdater.Start(servidor);
-        }
-
-        private static string LerConfigAtualizacao()
-        {
-            try
-            {
-                // Combine o diretório do executável com o nome do arquivo
-                string caminhoArquivoConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.xml");
-
-                XDocument doc = XDocument.Load(caminhoArquivoConfig);
-                return doc.Element("Configuracao").Element("CaminhoAtualizacao").Value;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao ler o arquivo de configuração: {ex.Message}");
-                return string.Empty;
-            }
-        }
 
         static void RealizarCalculo()
         {
@@ -176,7 +144,7 @@ namespace Simplificador
                         loopState.Break();
                 }
             });
-            Console.WriteLine($"{sw.ElapsedMilliseconds} ms");
+            Console.WriteLine($" {sw.ElapsedMilliseconds} ms");
             #endregion
 
 
@@ -579,8 +547,18 @@ namespace Simplificador
             Metodo = string.Empty;
             Console.Clear();
         }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            var user = Environment.UserName;
+            var maquina = Environment.MachineName;
+            var diretorio = Environment.CurrentDirectory;
+            Version versionAss = Assembly.GetEntryAssembly().GetName().Version;
+            Exception ex = (Exception)e.ExceptionObject;
+            var separador = "- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -";
+
+            LogHelper.EscreverLog($"\r\n{separador}\r\nUsuário: {user}\r\nPC: {maquina}\r\nDiretório: {diretorio}\r\nVersão do App: {versionAss}\r\n" +
+                $"Numerador: {Numerador}, Denominador: {Denominador}, Percentual de erro: {PercentualErro}, Método: {Metodo}\r\nPilha Exceção: {ex}\r\n{separador}\r\n");
+        }
     }
-
-
-   
 }

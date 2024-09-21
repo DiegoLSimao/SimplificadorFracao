@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Configuracao>
   <CaminhoAtualizacao>file://C:\Users\diego\Dropbox\ServidorTesteDenigres\infoVersaoAtualizada.xml</CaminhoAtualizacao>
+  <servidor>C:\Users\diego\Dropbox\ServidorTesteDenigres</servidor>
 </Configuracao>
