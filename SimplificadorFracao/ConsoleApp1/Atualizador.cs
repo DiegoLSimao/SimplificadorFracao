@@ -11,14 +11,16 @@ namespace SimplificadorFracao
     {
         public static void VerificarAtualizacao()
         {
-            string servidor = LerXML.LerConfiguracao("CaminhoAtualizacao");
-            if (servidor == null)
+            if(FileHelper.FileExistsWithTimeout(LerXML.PathAtualizacao).Exists)
             {
-                LogHelper.EscreverLog("VerificarAtualizacao(): Não foi possível ler o arquivo config.xml");
-                return;
+                AutoUpdater.RunUpdateAsAdmin = false;
+                AutoUpdater.Start(LerXML.PathAtualizacao);
             }
-            AutoUpdater.RunUpdateAsAdmin = false;
-            AutoUpdater.Start(servidor);
+            else
+            {
+                LogHelper.EscreverLog("VerificarAtualizacao(): Não foi possível verificar se tem atualização, o caminho do arquivo InfoAtualizada.xml não foi localizado.");
+                return;
+            }            
         }
     }
 }

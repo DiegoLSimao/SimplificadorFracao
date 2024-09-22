@@ -10,25 +10,39 @@ namespace SimplificadorFracao
 {
     internal static class LerXML
     {
-        public static string LerConfiguracao(string element)
+        public static string PathServidor { get; private set; }
+        public static string PathAtualizacao { get; private set; }
+        public static string PathLocalApp { get; private set; }
+
+        private static string LerConfiguracao(string element)
         {
             try
             {
-                // Combine o diretório do executável com o nome do arquivo
                 string caminhoArquivoConfig = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "config.xml");
 
-                if (File.Exists(caminhoArquivoConfig))
+                if (FileHelper.FileExistsWithTimeout(caminhoArquivoConfig).Exists)
                 {
                     XDocument doc = XDocument.Load(caminhoArquivoConfig);
                     return doc.Element("Configuracao").Element(element).Value;
                 }
-                return null;
+                else
+                {
+                    return null;
+                } 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Erro ao ler o arquivo de configuração: {ex.Message}");
                 return null;
             }
+        }
+
+
+        public static void CarregarConfig()
+        {
+            PathAtualizacao = LerConfiguracao("CaminhoAtualizacao");
+            PathServidor = LerConfiguracao("servidor");
+            PathLocalApp = AppDomain.CurrentDomain.BaseDirectory;
         }
     }
 }

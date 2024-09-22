@@ -25,7 +25,8 @@ namespace Simplificador
 
         static void Main(string[] args)
         {
-            LogHelper.CriarArquivoLog();
+            LerXML.CarregarConfig();
+            LogHelper.CriarArquivosLog();
             Atualizador.VerificarAtualizacao();
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
@@ -37,7 +38,6 @@ namespace Simplificador
                 {
                     case 0:
                         {
-                            LogHelper.EscreverLog("Ola!!!");
                             if (!Cabecalho) EscreverCabecalho();
                             Estado = 1;
                             break;
@@ -77,10 +77,9 @@ namespace Simplificador
 
                     default:
                         {
-                            Console.WriteLine($"Estado={Estado} --> ERRO GRAVE, Tem que tá vendo isso!");
-                            Console.ReadLine();
                             Estado = 0;
-                            break;
+                            LogHelper.EscreverLog($"Default no loop principal, falha grave, máquina Estado={Estado}");
+                            throw new ArgumentException($"O Estado {Estado}, não era esperado no switch case do loop principal!!!");
                         }
                 };                 
             }// fim while loop
@@ -116,11 +115,14 @@ namespace Simplificador
             
             double valorOriginal = (double)Numerador / (double)Denominador;
             bool encontrouSolucao = false;
+            uint faixaCorte = denominador/2;
+
+
             List<Numero> listNumeros = new List<Numero>();
 
 
             Console.Write("Processando:");
-            Parallel.For(1L, denominador, (i, loopState) =>
+            Parallel.For(2L, denominador, (i, loopState) =>
             {
                 if (numerador == 1)
                     loopState.Break();
@@ -128,11 +130,23 @@ namespace Simplificador
                 uint novoNumerador = numerador / (uint)i;
                 uint novoDenominador = denominador / (uint)i;
                 double novoValor = (double)novoNumerador / novoDenominador;
-                double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100;
+                double erroPercentual = Math.Abs((novoValor - valorOriginal) / valorOriginal) * 100.0;
 
 
                 if (erroPercentual <= percentualErro)
                 {
+                    //*** Faixa de corte para não estourar a memória
+                    if (novoNumerador < faixaCorte && novoDenominador < faixaCorte)
+                    {                    
+                        //lista com mais de 500 mil itens e diferença da iteração atual para o fim, maior que 2x500mil, então limpa coleção e reduz faixa de corte pela metade
+                        if ((listNumeros.Count > 500_000) && ((denominador-i) > (2*500_000)))
+                        {
+                            listNumeros.Clear();
+                            faixaCorte = faixaCorte / 2;
+                        }
+                    }
+                    //***
+                        
                     encontrouSolucao = true;
 
                     //*** Lista com todos os resultados dentro do percentual desejado
